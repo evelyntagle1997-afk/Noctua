@@ -95,7 +95,7 @@ nav svg{width:24px;height:24px}
     <input type="range" id="sens" min="5" max="90" value="55">
     <label for="mode">Modo de grabación</label>
     <select id="mode"><option value="ev">Solo cuando hay sonido (ahorra espacio)</option><option value="all">Toda la noche continuo (bloques de 15 min)</option></select>
-    <div class="row" style="margin-top:14px"><button id="darkBtn">Pantalla negra</button><span class="note">Deja el celular cargando y con la app abierta. Mientras suenen sonidos relajantes, no se detecta (para no grabarlos).</span></div>
+    <div class="row" style="margin-top:14px"><button id="darkBtn">Pantalla negra</button><span class="note">Puedes apagar la pantalla: sigue grabando y sonando. No cierres la app ni Chrome. Se adapta al ruido de fondo (lluvia, ventilador) y graba lo que sobresale.</span></div>
   </div>
 </section>
 
@@ -161,11 +161,12 @@ let AC, stream, an, rec=null, recOn=false, loop, wake, clipStart=0, lastLoud=0, 
 const mime=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg'].find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported(m))||'';
 const ctx=()=>AC||(AC=new (window.AudioContext||window.webkitAudioContext)());
 const sens=$('#sens'); sens.value=LS.get('sens',55); $('#mode').value=LS.get('mode','ev');
-const thrLevel=()=>100-+sens.value;
+let floor=30;const margin=()=>Math.max(3,40-+sens.value*.4), thrLevel=()=>Math.min(98,floor+margin());
 const setThr=()=>{$('#thr').style.left=thrLevel()+'%';LS.set('sens',+sens.value)}; sens.oninput=setThr; setThr();
+const WK=`class M extends AudioWorkletProcessor{constructor(){super();this.s=0;this.n=0;this.z=0;this.p=0}process(i){const c=i[0]&&i[0][0];if(c){for(let k=0;k<c.length;k++){const v=c[k];this.s+=v*v;if((v>=0)!==(this.p>=0))this.z++;this.p=v}this.n+=c.length;if(this.n>=sampleRate/10){this.port.postMessage({r:Math.sqrt(this.s/this.n),f:this.z*sampleRate/(2*this.n)});this.s=0;this.n=0;this.z=0}}return true}}registerProcessor('noctua-meter',M)`;
 $('#mode').onchange=e=>LS.set('mode',e.target.value);
 
-function tagFor(c){if(!c)return 'sonido';if(c<350)return 'grave · ronquido o gas';if(c<2200)return 'medio · voz o movimiento';return 'agudo · ruido o golpe'}
+function tagFor(c){if(!c)return 'sonido';if(c<400)return 'grave · ronquido o gas';if(c<2500)return 'medio · voz o movimiento';return 'agudo · ruido o golpe'}
 function startClip(){
   chunks=[];peak=0;cSum=0;cN=0;clipStart=Date.now();
   rec=new MediaRecorder(stream,mime?{mimeType:mime}:undefined);
@@ -179,27 +180,29 @@ function startClip(){
 }
 function stopClip(){if(rec&&rec.state!=='inactive')rec.stop();rec=null}
 async function startNight(){
-  try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:true}})}
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:false,autoGainControl:true}})}
   catch(e){$('#stTxt').textContent='No hay permiso de micrófono';$('#stSub').textContent='Abre la app desde un enlace https y acepta el micrófono.';return}
-  const c=ctx();await c.resume();an=c.createAnalyser();an.fftSize=2048;c.createMediaStreamSource(stream).connect(an);
-  const td=new Float32Array(an.fftSize), fd=new Uint8Array(an.frequencyBinCount), hz=c.sampleRate/an.fftSize;
-  recOn=true;count=0;$('#archBox').classList.add('rec');$('#stTxt').textContent='Escuchando la noche…';$('#stSub').textContent='Toca la luna al despertar';
+  const c=ctx();await c.resume();
+  try{await c.audioWorklet.addModule(URL.createObjectURL(new Blob([WK],{type:'text/javascript'})))}catch(e){}
+  an=new AudioWorkletNode(c,'noctua-meter');const mute=c.createGain();mute.gain.value=0;
+  c.createMediaStreamSource(stream).connect(an).connect(mute).connect(c.destination);
+  recOn=true;floor=30;count=0;$('#archBox').classList.add('rec');$('#stTxt').textContent='Escuchando la noche…';$('#stSub').textContent='Toca la luna al despertar';
   try{wake=await navigator.wakeLock?.request('screen')}catch(e){}
   if($('#mode').value==='all'){startClip();segTimer=setInterval(()=>{stopClip();startClip()},15*60e3)}
-  loop=setInterval(()=>{
-    an.getFloatTimeDomainData(td);let s=0;for(const v of td)s+=v*v;
-    const db=20*Math.log10(Math.sqrt(s/td.length)+1e-9), L=Math.max(0,Math.min(100,(db+75)*100/65));
-    $('#lvl').style.width=L+'%';
+  /* el análisis corre en el hilo de audio: sigue funcionando con la pantalla apagada */
+  an.port.onmessage=({data})=>{
+    const L=Math.max(0,Math.min(100,(20*Math.log10(data.r+1e-9)+75)*100/65)), vis=!document.hidden;
+    floor=L<floor?floor*.7+L*.3:floor+(L-floor)*.003;
+    if(vis){$('#lvl').style.width=L+'%';$('#thr').style.left=thrLevel()+'%'}
     if($('#mode').value==='all'){peak=Math.max(peak,L);return}
-    const loud=L>thrLevel()&&!anyPlaying(), now=Date.now();
-    if(loud){lastLoud=now;if(!rec)startClip();peak=Math.max(peak,L);
-      an.getByteFrequencyData(fd);let a=0,b=0;for(let i=2;i<fd.length;i++){a+=i*hz*fd[i];b+=fd[i]}if(b){cSum+=a/b;cN++}}
+    const now=Date.now();
+    if(L>thrLevel()){lastLoud=now;if(!rec)startClip();peak=Math.max(peak,L);cSum+=data.f;cN++}
     if(rec&&(now-lastLoud>3500||now-clipStart>90e3))stopClip();
-  },100);
+  };
   const ses=LS.get('ses',[]);ses.push({start:Date.now()});LS.set('ses',ses);
 }
 function stopNight(){
-  recOn=false;clearInterval(loop);clearInterval(segTimer);stopClip();stream?.getTracks().forEach(t=>t.stop());
+  recOn=false;if(an){an.port.onmessage=null;try{an.disconnect()}catch(e){}}clearInterval(segTimer);stopClip();stream?.getTracks().forEach(t=>t.stop());
   try{wake?.release()}catch(e){}wake=null;$('#lvl').style.width='0';
   const ses=LS.get('ses',[]);if(ses.length){ses[ses.length-1].end=Date.now();LS.set('ses',ses)}
   $('#archBox').classList.remove('rec');$('#stTxt').textContent='Buenos días. '+count+' sonido'+(count===1?'':'s')+' grabado'+(count===1?'':'s');
@@ -276,16 +279,19 @@ function noise(kind){const c=ctx(),n=c.sampleRate*6,b=c.createBuffer(1,n,c.sampl
     else if(kind==='pink'){b0=.997*b0+w*.029;b1=.985*b1+w*.032;b2=.95*b2+w*.048;d[i]=(b0+b1+b2+w*.02)*.9}
     else d[i]=w}
   const s=c.createBufferSource();s.buffer=b;s.loop=true;return s}
+/* gotas/chasquidos pre-grabados en un bucle: no dependen de temporizadores, siguen con pantalla apagada */
+function baked(sec,perSec,amp,len){const c=ctx(),n=c.sampleRate*sec,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0),L=Math.floor(c.sampleRate*len);
+  for(let k=0;k<sec*perSec;k++){const st=Math.floor(Math.random()*(n-L*2)),a=amp*(.2+Math.random()*.8),ln=Math.floor(L*(.3+Math.random()));
+    for(let i=0;i<ln;i++)d[st+i]+=(Math.random()*2-1)*a*Math.exp(-5*i/ln)}
+  const s=c.createBufferSource();s.buffer=b;s.loop=true;return s}
 function lfo(f,amt,target,off){const c=ctx(),o=c.createOscillator(),g=c.createGain();o.frequency.value=f;g.gain.value=amt;o.connect(g).connect(target);if(off!=null)target.value=off;o.start();return o}
 function filt(type,f,q){const x=ctx().createBiquadFilter();x.type=type;x.frequency.value=f;if(q)x.Q.value=q;return x}
 const SOUNDS={
   lluvia:{n:'Lluvia',d:'en la ventana',mk(o){const s=noise('white'),h=filt('highpass',500),l=filt('lowpass',7000),g=ctx().createGain();g.gain.value=.18;s.connect(h).connect(l).connect(g).connect(o);s.start();
-    const iv=setInterval(()=>{const c=ctx(),b=noise('white'),f=filt('bandpass',1500+Math.random()*4000,8),e=c.createGain(),t=c.currentTime;e.gain.setValueAtTime(.25*Math.random(),t);e.gain.exponentialRampToValueAtTime(.001,t+.05);b.connect(f).connect(e).connect(o);b.start(t,Math.random()*5);b.stop(t+.06)},70);
-    return[s,{stop:()=>clearInterval(iv)}]}},
+    const d=baked(14,14,.25,.04),f=filt('bandpass',3000,1.5);d.connect(f).connect(o);d.start();return[s,d]}},
   mar:{n:'Mar',d:'olas lentas',mk(o){const s=noise('brown'),l=filt('lowpass',900),g=ctx().createGain();s.connect(l).connect(g).connect(o);s.start();const a=lfo(.09,.32,g.gain,.38),b=lfo(.09,500,l.frequency,800);return[s,a,b]}},
   fuego:{n:'Chimenea',d:'leña crepitando',mk(o){const s=noise('brown'),l=filt('lowpass',420),g=ctx().createGain();g.gain.value=.55;s.connect(l).connect(g).connect(o);s.start();
-    const iv=setInterval(()=>{if(Math.random()>.35)return;const c=ctx(),b=noise('white'),f=filt('bandpass',1800+Math.random()*3500,3),e=c.createGain(),t=c.currentTime,len=.004+Math.random()*.02;e.gain.setValueAtTime(.2+Math.random()*.6,t);e.gain.exponentialRampToValueAtTime(.001,t+len);b.connect(f).connect(e).connect(o);b.start(t,Math.random()*5);b.stop(t+len+.01)},55);
-    return[s,{stop:()=>clearInterval(iv)}]}},
+    const d=baked(17,6,.8,.012),f=filt('highpass',1500);d.connect(f).connect(o);d.start();return[s,d]}},
   viento:{n:'Viento',d:'en el bosque',mk(o){const s=noise('pink'),f=filt('bandpass',600,1.2),g=ctx().createGain();g.gain.value=.5;s.connect(f).connect(g).connect(o);s.start();return[s,lfo(.05,350,f.frequency,650),lfo(.13,.2,g.gain,.45)]}},
   grillos:{n:'Noche de grillos',d:'campo tranquilo',mk(o){const c=ctx(),os=c.createOscillator(),a=c.createGain(),b=c.createGain();os.frequency.value=4300;a.gain.value=0;b.gain.value=0;os.connect(a).connect(b).connect(o);os.start();
     const x=lfo(32,.5,a.gain,0),y=lfo(.9,.06,b.gain,.0);return[os,x,y]}},
@@ -296,8 +302,10 @@ $('#sndGrid').innerHTML=Object.entries(SOUNDS).map(([k,s])=>`<button class="snd"
 function getMaster(){const c=ctx();if(!master){master=c.createGain();master.connect(c.destination)}master.gain.cancelScheduledValues(c.currentTime);master.gain.setValueAtTime(+$('#vol').value/100,c.currentTime);return master}
 function stopSnd(k){(nodes[k]||[]).forEach(n=>{try{n.stop()}catch(e){}});delete nodes[k];const b=document.querySelector(`.snd[data-k="${k}"]`);b.classList.remove('on');b.setAttribute('aria-pressed','false')}
 function stopAll(){Object.keys(nodes).forEach(stopSnd);clearInterval(tInt);$('#tmrTxt').textContent=''}
-function armTimer(){clearInterval(tInt);const m=+$('#tmr').value;if(!m||!anyPlaying()){$('#tmrTxt').textContent='';return}tEnd=Date.now()+m*60e3;
-  tInt=setInterval(()=>{const r=tEnd-Date.now();if(r<=0){const c=ctx();master.gain.setTargetAtTime(0,c.currentTime,4);setTimeout(stopAll,15e3);clearInterval(tInt);$('#tmrTxt').textContent='Apagando suavemente…';return}
+function armTimer(){clearInterval(tInt);const m=+$('#tmr').value,c=ctx();if(master){master.gain.cancelScheduledValues(c.currentTime);master.gain.setValueAtTime(+$('#vol').value/100,c.currentTime)}
+  if(!m||!anyPlaying()){$('#tmrTxt').textContent='';return}tEnd=Date.now()+m*60e3;
+  master.gain.setTargetAtTime(0,c.currentTime+m*60,4); /* el apagado lo programa el reloj de audio: funciona con pantalla apagada */
+  tInt=setInterval(()=>{const r=tEnd-Date.now();if(r<=-20e3){stopAll();return}if(r<=0){$('#tmrTxt').textContent='Apagando suavemente…';return}
     $('#tmrTxt').textContent='Se apaga en '+Math.ceil(r/60e3)+' min'},1000)}
 $('#sndGrid').onclick=async e=>{const b=e.target.closest('.snd');if(!b)return;const k=b.dataset.k;await ctx().resume();
   if(nodes[k]){stopSnd(k);if(!anyPlaying())stopAll();return}
