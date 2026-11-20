@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#120c0a">
+<title>Noctua · sueños</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* VOICE: nocturno, gótico, íntimo
+   IDEA: un grimorio de cuero con piel de vaca marrón y luna de plata
+   PICTURE: luna creciente grande que late mientras graba
+   COLOUR: noche café #120c0a, piel vaca crema/espresso, carmesí #9e1b32, plata #cfc8dc
+   TYPE: UnifrakturCook títulos + Cormorant Garamond texto */
+:root{--bg:#120c0a;--bg2:#1d1411;--ink:#eee4d6;--mute:#a8998a;--cream:#efe3cf;--choc:#3b2216;--car:#a8743f;--red:#9e1b32;--silver:#cfc8dc;--line:#3a2a22}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 "Cormorant Garamond",Georgia,serif;overflow-x:clip}
+h1,h2,h3{font-family:"UnifrakturCook",serif;font-weight:700;line-height:1.05;margin:0 0 .4em;text-wrap:balance}
+h1{font-size:clamp(34px,8vw,48px);color:var(--silver)}h2{font-size:30px;color:var(--silver)}h3{font-size:22px}
+.cow{background-color:var(--cream);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cg fill='%233b2216'%3E%3Cpath d='M20 30c25-20 70-10 72 18 3 30-30 22-40 44-9 20-45 12-46-14-1-18 0-36 14-48z'/%3E%3Cpath d='M150 10c30-6 62 8 58 34-3 22-34 18-44 34-12 18-44 4-40-24 2-22 6-38 26-44z'/%3E%3Cpath d='M110 120c34-12 68 14 52 44-12 22-48 34-70 18-20-14-12-50 18-62z' /%3E%3Cpath d='M210 150c22-4 44 16 40 40-4 20-32 26-46 12-14-14-14-48 6-52z'/%3E%3Cpath d='M30 180c22-8 46 6 42 30-4 22 6 40-20 44-24 4-46-20-40-44 3-14 6-24 18-30z'/%3E%3C/g%3E%3Cg fill='%23a8743f' opacity='.55'%3E%3Cpath d='M200 95c10-4 22 4 18 14-4 9-20 8-22-2-1-5 0-10 4-12z'/%3E%3Cpath d='M70 120c8-3 16 3 14 10-2 8-14 8-16 1-1-5-1-9 2-11z'/%3E%3C/g%3E%3C/svg%3E");color:#241510}
+header{padding:22px 18px 8px;display:flex;align-items:center;gap:14px;max-width:760px;margin:auto}
+header svg{flex:none}
+header p{margin:0;color:var(--mute);font-style:italic}
+main{max-width:760px;margin:auto;padding:0 16px 110px}
+section{display:none}section.on{display:block}
+.arch{border:1px solid var(--line);border-radius:140px 140px 18px 18px;padding:28px 18px 22px;background:linear-gradient(180deg,#24180f,var(--bg2));text-align:center;position:relative}
+.moon{width:min(220px,60vw);aspect-ratio:1;margin:6px auto 10px;display:block;cursor:pointer;border:0;background:none;padding:0}
+.moon svg{width:100%;height:100%;filter:drop-shadow(0 0 22px #cfc8dc55)}
+.rec .moon svg{animation:pulse 2.4s ease-in-out infinite;filter:drop-shadow(0 0 30px #9e1b3299)}
+@keyframes pulse{50%{transform:scale(1.05)}}
+@media(prefers-reduced-motion:reduce){.rec .moon svg{animation:none}}
+.big{font-size:22px;color:var(--silver)}
+.meter{height:14px;border-radius:7px;background:#0b0706;border:1px solid var(--line);position:relative;overflow:hidden;margin:14px 0 6px}
+.meter i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--car),var(--red));width:0}
+.meter b{position:absolute;top:0;bottom:0;width:2px;background:var(--silver)}
+label{display:block;margin:12px 0 4px;color:var(--mute);font-size:16px}
+input,select,textarea{width:100%;font:16px/1.4 "Cormorant Garamond",serif;font-size:17px;background:#0f0a08;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px}
+textarea{min-height:170px;resize:vertical}
+input[type=range]{padding:0;accent-color:var(--red)}
+button,.btn{font:600 17px "Cormorant Garamond",serif;min-height:44px;padding:8px 16px;border-radius:22px;border:1px solid var(--line);background:var(--bg2);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+button.pri{background:var(--red);border-color:#c23a50;color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--silver);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--bg2);margin:12px 0}
+.snd{border-radius:16px;padding:14px;border:1px solid var(--line);background:var(--bg2);text-align:left}
+.snd.on{border-color:var(--red);box-shadow:inset 0 0 0 1px var(--red),0 0 18px #9e1b3344}
+.snd b{font-size:19px;display:block}.snd small{color:var(--mute)}
+.note{color:var(--mute);font-size:15px;font-style:italic}
+.book{border-radius:6px 16px 16px 6px;padding:0;overflow:hidden;border:2px solid #241510;box-shadow:6px 8px 0 #0008}
+.book .spine{padding:16px 16px 6px}
+.book .page{background:#f6ecdc;color:#241510;margin:0 10px 10px;border-radius:4px 10px 10px 4px;padding:14px 16px;border-left:3px double #3b2216}
+.book h3{color:#241510}
+.tag{display:inline-block;font-size:14px;padding:1px 10px;border-radius:10px;background:#3b2216;color:var(--cream);margin:2px 4px 2px 0}
+.tag.p{background:var(--red)}.tag.l{background:#4b4466}
+.night{margin:18px 0 6px}
+.tl{position:relative;height:26px;background:#0b0706;border:1px solid var(--line);border-radius:13px;margin:6px 0 10px}
+.tl span{position:absolute;top:5px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--car);border:2px solid var(--bg)}
+.clip{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.clip audio{grid-column:1/-1;width:100%;height:40px}
+.time{white-space:nowrap;font-weight:600}
+nav{position:fixed;left:0;right:0;bottom:0;background:#0b0706ee;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:6px 4px calc(6px + env(safe-area-inset-bottom));backdrop-filter:blur(6px);z-index:5}
+nav button{border:0;background:none;border-radius:12px;flex-direction:column;gap:0;font-size:15px;color:var(--mute);padding:4px}
+nav button.on{color:var(--silver);background:#1d1411}
+nav svg{width:24px;height:24px}
+#dark{position:fixed;inset:0;background:#000;z-index:9;display:none;flex-direction:column;align-items:center;justify-content:center;color:#3a2e2a;text-align:center}
+#dark .clk{font-size:64px;font-family:"UnifrakturCook",serif;color:#2a1e1a}
+#dlg{position:fixed;inset:0;background:#000a;z-index:8;display:none;align-items:flex-end;justify-content:center}
+#dlg .box{background:var(--bg2);border:1px solid var(--line);border-radius:20px 20px 0 0;padding:18px;width:min(760px,100%);max-height:92vh;overflow:auto}
+.story{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.empty{text-align:center;color:var(--mute);padding:30px 10px;font-style:italic}
+</style>
+</head>
+<body>
+<header>
+<svg width="52" height="52" viewBox="0 0 100 100" aria-hidden="true"><path d="M62 8a44 44 0 1 0 30 66A36 36 0 1 1 62 8z" fill="#cfc8dc"/><path d="M30 60l6-14 6 14m-10-4h8" stroke="#9e1b32" stroke-width="3" fill="none"/></svg>
+<div><h1>Noctua</h1><p>grimorio de la noche y los sueños</p></div>
+</header>
+
+<main>
+<!-- NOCHE -->
+<section id="s-noche" class="on">
+  <div class="arch" id="archBox">
+    <button class="moon" id="moonBtn" aria-label="Empezar o detener grabación">
+      <svg viewBox="0 0 200 200"><defs><radialGradient id="mg" cx="40%" cy="35%"><stop offset="0" stop-color="#fbf7ff"/><stop offset="1" stop-color="#9f97b3"/></radialGradient></defs><circle cx="100" cy="100" r="78" fill="url(#mg)"/><circle cx="128" cy="86" r="66" fill="#1d1411"/><circle cx="62" cy="120" r="7" fill="#8f87a3" opacity=".6"/><circle cx="48" cy="88" r="4" fill="#8f87a3" opacity=".6"/><path d="M40 160q60 30 120 0" stroke="#9e1b32" stroke-width="2" fill="none" opacity=".7"/></svg>
+    </button>
+    <div class="big" id="stTxt">Toca la luna para empezar la noche</div>
+    <div class="note" id="stSub">Graba voces, ronquidos, gases y todo lo que suene a tu alrededor</div>
+    <div class="meter" aria-hidden="true"><i id="lvl"></i><b id="thr"></b></div>
+    <div class="row" style="justify-content:space-between"><span class="note">nivel del ambiente</span><span class="note" id="cnt">0 sonidos esta noche</span></div>
+  </div>
+  <div class="card">
+    <label for="sens">Sensibilidad (más a la derecha = capta sonidos más suaves)</label>
+    <input type="range" id="sens" min="5" max="90" value="55">
+    <label for="mode">Modo de grabación</label>
+    <select id="mode"><option value="ev">Solo cuando hay sonido (ahorra espacio)</option><option value="all">Toda la noche continuo (bloques de 15 min)</option></select>
+    <div class="row" style="margin-top:14px"><button id="darkBtn">Pantalla negra</button><span class="note">Deja el celular cargando y con la app abierta. Mientras suenen sonidos relajantes, no se detecta (para no grabarlos).</span></div>
+  </div>
+</section>
+
+<!-- GRABACIONES -->
+<section id="s-rec"><h2>Lo que sonó de noche</h2><div id="recList"></div></section>
+
+<!-- SUEÑOS -->
+<section id="s-dream">
+  <div class="row" style="justify-content:space-between"><h2>Cuaderno de sueños</h2><button class="pri" id="newDream">+ Nuevo sueño</button></div>
+  <input id="q" placeholder="Buscar en tus sueños…" aria-label="Buscar">
+  <div id="dreamList"></div>
+  <div class="row" style="margin-top:10px"><button id="expBtn">Exportar copia</button><label class="btn" for="impF" style="margin:0">Importar copia</label><input type="file" id="impF" accept=".json" hidden></div>
+</section>
+
+<!-- RELAJAR -->
+<section id="s-relax">
+  <h2>Para dormir</h2>
+  <div class="grid" id="sndGrid"></div>
+  <div class="card">
+    <label for="vol">Volumen general</label><input type="range" id="vol" min="0" max="100" value="70">
+    <label for="tmr">Apagar en</label>
+    <select id="tmr"><option value="0">Sin temporizador</option><option value="15">15 min</option><option value="30" selected>30 min</option><option value="45">45 min</option><option value="60">1 hora</option><option value="90">1 h 30</option></select>
+    <div class="note" id="tmrTxt"></div>
+  </div>
+  <h2 style="margin-top:20px">Cuentos al oído</h2>
+  <div class="card" id="stories"></div>
+  <div class="row"><button id="stopStory">Detener cuento</button><span class="note">Combina un cuento con chimenea o lluvia.</span></div>
+</section>
+</main>
+
+<nav>
+  <button data-s="noche" class="on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 2a10 10 0 1 0 7 15A8 8 0 1 1 15 2z"/></svg>Noche</button>
+  <button data-s="rec"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zm-7 9h2a5 5 0 0 0 10 0h2a7 7 0 0 1-6 7v3h-2v-3a7 7 0 0 1-6-7z"/></svg>Sonidos</button>
+  <button data-s="dream"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h12a2 2 0 0 1 2 2v16l-4-2-4 2-4-2-2 1V5a2 2 0 0 1 2-2z"/></svg>Sueños</button>
+  <button data-s="relax"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c3 4 6 7 6 11a6 6 0 0 1-12 0c0-2 1-4 3-6 0 2 1 3 2 3 0-3 0-5 1-8z"/></svg>Relajar</button>
+</nav>
+
+<div id="dark"><div class="clk" id="clk">00:00</div><div id="darkInfo">grabando…</div><p style="margin-top:30px">toca dos veces para salir</p></div>
+<div id="dlg"><div class="box" id="dlgBox"></div></div>
+
+<script>
+{
+const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0'), hm=t=>{const d=new Date(t);return pad(d.getHours())+':'+pad(d.getMinutes())};
+const dayKey=t=>{const d=new Date(t);if(d.getHours()<12)d.setDate(d.getDate()-1);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+const fmtDay=k=>new Date(k+'T12:00').toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'});
+const LS={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- navegación ---------- */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id==='s-'+b.dataset.s));
+  if(b.dataset.s==='rec')renderRecs(); if(b.dataset.s==='dream')renderDreams(); scrollTo(0,0);
+});
+
+/* ---------- base de datos de grabaciones ---------- */
+let dbP=new Promise((ok,ko)=>{try{const r=indexedDB.open('noctua',1);r.onupgradeneeded=()=>r.result.createObjectStore('clips',{keyPath:'id'});r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error)}catch(e){ko(e)}});
+const tx=async(mode,fn)=>{const db=await dbP;return new Promise((ok,ko)=>{const t=db.transaction('clips',mode);const r=fn(t.objectStore('clips'));t.oncomplete=()=>ok(r&&r.result);t.onerror=()=>ko(t.error)})};
+const putClip=c=>tx('readwrite',s=>s.put(c)), allClips=()=>tx('readonly',s=>s.getAll()), delClip=id=>tx('readwrite',s=>s.delete(id));
+
+/* ---------- grabación nocturna ---------- */
+let AC, stream, an, rec=null, recOn=false, loop, wake, clipStart=0, lastLoud=0, peak=0, cSum=0, cN=0, chunks=[], count=0, segTimer;
+const mime=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg'].find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported(m))||'';
+const ctx=()=>AC||(AC=new (window.AudioContext||window.webkitAudioContext)());
+const sens=$('#sens'); sens.value=LS.get('sens',55); $('#mode').value=LS.get('mode','ev');
+const thrLevel=()=>100-+sens.value;
+const setThr=()=>{$('#thr').style.left=thrLevel()+'%';LS.set('sens',+sens.value)}; sens.oninput=setThr; setThr();
+$('#mode').onchange=e=>LS.set('mode',e.target.value);
+
+function tagFor(c){if(!c)return 'sonido';if(c<350)return 'grave · ronquido o gas';if(c<2200)return 'medio · voz o movimiento';return 'agudo · ruido o golpe'}
+function startClip(){
+  chunks=[];peak=0;cSum=0;cN=0;clipStart=Date.now();
+  rec=new MediaRecorder(stream,mime?{mimeType:mime}:undefined);
+  rec.ondataavailable=e=>e.data.size&&chunks.push(e.data);
+  const st=clipStart, isAll=$('#mode').value==='all';
+  rec.onstop=async()=>{const dur=(Date.now()-st)/1000;if(!chunks.length)return;
+    const blob=new Blob(chunks,{type:rec?.mimeType||mime||'audio/webm'});
+    await putClip({id:st,t:st,night:dayKey(st),dur,peak:Math.round(peak),tag:isAll?'bloque continuo':tagFor(cN?cSum/cN:0),blob});
+    count++;$('#cnt').textContent=count+' sonido'+(count>1?'s':'')+' esta noche';};
+  rec.start(1000);
+}
+function stopClip(){if(rec&&rec.state!=='inactive')rec.stop();rec=null}
+async function startNight(){
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:true}})}
+  catch(e){$('#stTxt').textContent='No hay permiso de micrófono';$('#stSub').textContent='Abre la app desde un enlace https y acepta el micrófono.';return}
+  const c=ctx();await c.resume();an=c.createAnalyser();an.fftSize=2048;c.createMediaStreamSource(stream).connect(an);
+  const td=new Float32Array(an.fftSize), fd=new Uint8Array(an.frequencyBinCount), hz=c.sampleRate/an.fftSize;
+  recOn=true;count=0;$('#archBox').classList.add('rec');$('#stTxt').textContent='Escuchando la noche…';$('#stSub').textContent='Toca la luna al despertar';
+  try{wake=await navigator.wakeLock?.request('screen')}catch(e){}
+  if($('#mode').value==='all'){startClip();segTimer=setInterval(()=>{stopClip();startClip()},15*60e3)}
+  loop=setInterval(()=>{
+    an.getFloatTimeDomainData(td);let s=0;for(const v of td)s+=v*v;
+    const db=20*Math.log10(Math.sqrt(s/td.length)+1e-9), L=Math.max(0,Math.min(100,(db+75)*100/65));
+    $('#lvl').style.width=L+'%';
+    if($('#mode').value==='all'){peak=Math.max(peak,L);return}
+    const loud=L>thrLevel()&&!anyPlaying(), now=Date.now();
+    if(loud){lastLoud=now;if(!rec)startClip();peak=Math.max(peak,L);
+      an.getByteFrequencyData(fd);let a=0,b=0;for(let i=2;i<fd.length;i++){a+=i*hz*fd[i];b+=fd[i]}if(b){cSum+=a/b;cN++}}
+    if(rec&&(now-lastLoud>3500||now-clipStart>90e3))stopClip();
+  },100);
+  const ses=LS.get('ses',[]);ses.push({start:Date.now()});LS.set('ses',ses);
+}
+function stopNight(){
+  recOn=false;clearInterval(loop);clearInterval(segTimer);stopClip();stream?.getTracks().forEach(t=>t.stop());
+  try{wake?.release()}catch(e){}wake=null;$('#lvl').style.width='0';
+  const ses=LS.get('ses',[]);if(ses.length){ses[ses.length-1].end=Date.now();LS.set('ses',ses)}
+  $('#archBox').classList.remove('rec');$('#stTxt').textContent='Buenos días. '+count+' sonido'+(count===1?'':'s')+' grabado'+(count===1?'':'s');
+  $('#stSub').innerHTML='Escúchalos en <b>Sonidos</b> y escribe tu sueño en <b>Sueños</b>';
+}
+$('#moonBtn').onclick=()=>recOn?stopNight():startNight();
+document.addEventListener('visibilitychange',async()=>{if(recOn&&document.visibilityState==='visible'){try{wake=await navigator.wakeLock?.request('screen')}catch(e){}}});
+
+/* pantalla negra */
+let clkT;$('#darkBtn').onclick=()=>{$('#dark').style.display='flex';const u=()=>{const d=new Date();$('#clk').textContent=pad(d.getHours())+':'+pad(d.getMinutes());$('#darkInfo').textContent=recOn?'grabando · '+count+' sonidos':'sin grabar'};u();clkT=setInterval(u,20e3)};
+$('#dark').ondblclick=()=>{$('#dark').style.display='none';clearInterval(clkT)};
+let lastTap=0;$('#dark').addEventListener('touchend',()=>{const n=Date.now();if(n-lastTap<400){$('#dark').style.display='none';clearInterval(clkT)}lastTap=n});
+
+/* ---------- lista de grabaciones ---------- */
+let urls=[];
+async function renderRecs(){
+  urls.forEach(URL.revokeObjectURL);urls=[];
+  let clips=[];try{clips=await allClips()}catch(e){}
+  if(!clips.length){$('#recList').innerHTML='<div class="empty">Aún no hay sonidos. Graba una noche desde la luna.</div>';return}
+  const by={};clips.sort((a,b)=>b.t-a.t).forEach(c=>(by[c.night]??=[]).push(c));
+  $('#recList').innerHTML=Object.entries(by).map(([k,cs])=>{
+    const t0=Math.min(...cs.map(c=>c.t)), t1=Math.max(...cs.map(c=>c.t+c.dur*1000)), sp=Math.max(1,t1-t0);
+    return `<div class="night"><h3>${esc(fmtDay(k))}</h3><div class="note">${cs.length} sonidos · de ${hm(t0)} a ${hm(t1)}</div>
+    <div class="tl">${cs.map(c=>`<span style="left:${4+92*(c.t-t0)/sp}%;opacity:${.4+c.peak/170}" title="${hm(c.t)}"></span>`).join('')}</div>
+    ${cs.slice().reverse().map(c=>{const u=URL.createObjectURL(c.blob);urls.push(u);const ext=(c.blob.type.includes('mp4')?'m4a':c.blob.type.includes('ogg')?'ogg':'webm');
+      return `<div class="clip"><div><span class="time">${hm(c.t)}</span> · ${Math.round(c.dur)} s · <span class="tag">${esc(c.tag)}</span> <span class="note">intensidad ${c.peak}</span></div>
+      <div class="row"><a class="btn" href="${u}" download="noctua-${k}-${hm(c.t).replace(':','h')}.${ext}" aria-label="Descargar">↓</a><button data-del="${c.id}" aria-label="Borrar">✕</button></div><audio controls preload="none" src="${u}"></audio></div>`}).join('')}</div>`}).join('')
+    +'<p class="note">La etiqueta es una estimación por el tono del sonido; escucha para confirmar.</p>';
+}
+$('#recList').onclick=async e=>{const id=e.target.dataset.del;if(!id)return;
+  if(e.target.dataset.ok){await delClip(+id);renderRecs()}else{e.target.dataset.ok=1;e.target.textContent='¿Borrar?'}};
+
+/* ---------- cuaderno de sueños ---------- */
+let dreams=LS.get('dreams',[]);const saveD=()=>LS.set('dreams',dreams);
+const TYPES={normal:'Sueño',lucido:'Lúcido',pesadilla:'Pesadilla',recurrente:'Recurrente',raro:'Extraño'};
+async function renderDreams(){
+  const q=$('#q').value.toLowerCase().trim();let nights={};try{(await allClips()).forEach(c=>nights[c.night]=(nights[c.night]||0)+1)}catch(e){}
+  const list=dreams.filter(d=>!q||(d.title+' '+d.text+' '+d.mood).toLowerCase().includes(q)).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  $('#dreamList').innerHTML=list.length?list.map(d=>`<article class="card book cow"><div class="spine"><h3>${esc(d.title||'Sin título')}</h3>
+    <span class="tag ${d.type==='pesadilla'?'p':d.type==='lucido'?'l':''}">${TYPES[d.type]||'Sueño'}</span><span class="tag">${esc(fmtDay(d.date))}</span>${d.mood?`<span class="tag">${esc(d.mood)}</span>`:''}<span class="tag">nitidez ${'☾'.repeat(d.clar||3)}</span></div>
+    <div class="page"><div style="white-space:pre-wrap">${esc(d.text)}</div>${nights[d.date]?`<p class="note" style="color:#6b4a36">${nights[d.date]} sonidos grabados esa noche</p>`:''}
+    <div class="row" style="margin-top:8px"><button data-ed="${d.id}">Editar</button><button data-dl="${d.id}">Borrar</button></div></div></article>`).join('')
+    :`<div class="empty">${q?'Nada coincide con tu búsqueda.':'Tu grimorio está vacío. Escribe el primer sueño apenas despiertes, antes de que se borre.'}</div>`;
+}
+$('#q').oninput=renderDreams;
+function openDream(d){
+  d=d||{id:Date.now(),date:dayKey(Date.now()),title:'',text:LS.get('draft',''),type:'normal',mood:'',clar:3};
+  $('#dlgBox').innerHTML=`<h2>${d.title?'Editar sueño':'Nuevo sueño'}</h2>
+  <label for="fD">Noche</label><input type="date" id="fD" value="${d.date}">
+  <label for="fT">Título</label><input id="fT" value="${esc(d.title)}" placeholder="La casa con escaleras infinitas">
+  <label for="fX">¿Qué soñaste?</label><textarea id="fX" placeholder="Lugares, personas, colores, lo que sentías…">${esc(d.text)}</textarea>
+  <div class="grid"><div><label for="fY">Tipo</label><select id="fY">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${k===d.type?'selected':''}>${v}</option>`).join('')}</select></div>
+  <div><label for="fM">Emoción</label><input id="fM" value="${esc(d.mood)}" placeholder="miedo, paz, nostalgia…"></div>
+  <div><label for="fC">Nitidez (1–5)</label><input type="range" id="fC" min="1" max="5" value="${d.clar||3}"></div></div>
+  <div class="row" style="margin-top:16px"><button class="pri" id="fS">Guardar</button><button id="fN">Cancelar</button></div>`;
+  $('#dlg').style.display='flex';$('#fX').oninput=e=>{if(!d.title)LS.set('draft',e.target.value)};
+  $('#fN').onclick=()=>$('#dlg').style.display='none';
+  $('#fS').onclick=()=>{Object.assign(d,{date:$('#fD').value||d.date,title:$('#fT').value.trim(),text:$('#fX').value,type:$('#fY').value,mood:$('#fM').value.trim(),clar:+$('#fC').value});
+    dreams=dreams.filter(x=>x.id!==d.id);dreams.push(d);saveD();LS.set('draft','');$('#dlg').style.display='none';renderDreams()};
+}
+$('#newDream').onclick=()=>openDream();
+$('#dreamList').onclick=e=>{const ed=e.target.dataset.ed, dl=e.target.dataset.dl;
+  if(ed)openDream(dreams.find(x=>x.id==ed));
+  if(dl){if(e.target.dataset.ok){dreams=dreams.filter(x=>x.id!=dl);saveD();renderDreams()}else{e.target.dataset.ok=1;e.target.textContent='¿Seguro?'}}};
+$('#dlg').onclick=e=>{if(e.target.id==='dlg')$('#dlg').style.display='none'};
+$('#expBtn').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(dreams,null,1)],{type:'application/json'}));a.download='mis-suenos-'+dayKey(Date.now())+'.json';a.click()};
+$('#impF').onchange=async e=>{try{const arr=JSON.parse(await e.target.files[0].text());const ids=new Set(dreams.map(d=>d.id));arr.forEach(d=>!ids.has(d.id)&&dreams.push(d));saveD();renderDreams()}catch(err){}};
+
+/* ---------- sonidos relajantes (sintetizados) ---------- */
+let master, nodes={}, tEnd=0, tInt;
+function noise(kind){const c=ctx(),n=c.sampleRate*6,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);let l=0,b0=0,b1=0,b2=0;
+  for(let i=0;i<n;i++){const w=Math.random()*2-1;
+    if(kind==='brown'){l=(l+.02*w)/1.02;d[i]=l*3.5}
+    else if(kind==='pink'){b0=.997*b0+w*.029;b1=.985*b1+w*.032;b2=.95*b2+w*.048;d[i]=(b0+b1+b2+w*.02)*.9}
+    else d[i]=w}
+  const s=c.createBufferSource();s.buffer=b;s.loop=true;return s}
+function lfo(f,amt,target,off){const c=ctx(),o=c.createOscillator(),g=c.createGain();o.frequency.value=f;g.gain.value=amt;o.connect(g).connect(target);if(off!=null)target.value=off;o.start();return o}
+function filt(type,f,q){const x=ctx().createBiquadFilter();x.type=type;x.frequency.value=f;if(q)x.Q.value=q;return x}
+const SOUNDS={
+  lluvia:{n:'Lluvia',d:'en la ventana',mk(o){const s=noise('white'),h=filt('highpass',500),l=filt('lowpass',7000),g=ctx().createGain();g.gain.value=.18;s.connect(h).connect(l).connect(g).connect(o);s.start();
+    const iv=setInterval(()=>{const c=ctx(),b=noise('white'),f=filt('bandpass',1500+Math.random()*4000,8),e=c.createGain(),t=c.currentTime;e.gain.setValueAtTime(.25*Math.random(),t);e.gain.exponentialRampToValueAtTime(.001,t+.05);b.connect(f).connect(e).connect(o);b.start(t,Math.random()*5);b.stop(t+.06)},70);
+    return[s,{stop:()=>clearInterval(iv)}]}},
+  mar:{n:'Mar',d:'olas lentas',mk(o){const s=noise('brown'),l=filt('lowpass',900),g=ctx().createGain();s.connect(l).connect(g).connect(o);s.start();const a=lfo(.09,.32,g.gain,.38),b=lfo(.09,500,l.frequency,800);return[s,a,b]}},
+  fuego:{n:'Chimenea',d:'leña crepitando',mk(o){const s=noise('brown'),l=filt('lowpass',420),g=ctx().createGain();g.gain.value=.55;s.connect(l).connect(g).connect(o);s.start();
+    const iv=setInterval(()=>{if(Math.random()>.35)return;const c=ctx(),b=noise('white'),f=filt('bandpass',1800+Math.random()*3500,3),e=c.createGain(),t=c.currentTime,len=.004+Math.random()*.02;e.gain.setValueAtTime(.2+Math.random()*.6,t);e.gain.exponentialRampToValueAtTime(.001,t+len);b.connect(f).connect(e).connect(o);b.start(t,Math.random()*5);b.stop(t+len+.01)},55);
+    return[s,{stop:()=>clearInterval(iv)}]}},
+  viento:{n:'Viento',d:'en el bosque',mk(o){const s=noise('pink'),f=filt('bandpass',600,1.2),g=ctx().createGain();g.gain.value=.5;s.connect(f).connect(g).connect(o);s.start();return[s,lfo(.05,350,f.frequency,650),lfo(.13,.2,g.gain,.45)]}},
+  grillos:{n:'Noche de grillos',d:'campo tranquilo',mk(o){const c=ctx(),os=c.createOscillator(),a=c.createGain(),b=c.createGain();os.frequency.value=4300;a.gain.value=0;b.gain.value=0;os.connect(a).connect(b).connect(o);os.start();
+    const x=lfo(32,.5,a.gain,0),y=lfo(.9,.06,b.gain,.0);return[os,x,y]}},
+  marron:{n:'Ruido marrón',d:'tapa ruidos',mk(o){const s=noise('brown'),g=ctx().createGain();g.gain.value=.5;s.connect(g).connect(o);s.start();return[s]}}
+};
+const anyPlaying=()=>Object.keys(nodes).length>0;
+$('#sndGrid').innerHTML=Object.entries(SOUNDS).map(([k,s])=>`<button class="snd" data-k="${k}" aria-pressed="false"><b>${s.n}</b><small>${s.d}</small></button>`).join('');
+function getMaster(){const c=ctx();if(!master){master=c.createGain();master.connect(c.destination)}master.gain.cancelScheduledValues(c.currentTime);master.gain.setValueAtTime(+$('#vol').value/100,c.currentTime);return master}
+function stopSnd(k){(nodes[k]||[]).forEach(n=>{try{n.stop()}catch(e){}});delete nodes[k];const b=document.querySelector(`.snd[data-k="${k}"]`);b.classList.remove('on');b.setAttribute('aria-pressed','false')}
+function stopAll(){Object.keys(nodes).forEach(stopSnd);clearInterval(tInt);$('#tmrTxt').textContent=''}
+function armTimer(){clearInterval(tInt);const m=+$('#tmr').value;if(!m||!anyPlaying()){$('#tmrTxt').textContent='';return}tEnd=Date.now()+m*60e3;
+  tInt=setInterval(()=>{const r=tEnd-Date.now();if(r<=0){const c=ctx();master.gain.setTargetAtTime(0,c.currentTime,4);setTimeout(stopAll,15e3);clearInterval(tInt);$('#tmrTxt').textContent='Apagando suavemente…';return}
+    $('#tmrTxt').textContent='Se apaga en '+Math.ceil(r/60e3)+' min'},1000)}
+$('#sndGrid').onclick=async e=>{const b=e.target.closest('.snd');if(!b)return;const k=b.dataset.k;await ctx().resume();
+  if(nodes[k]){stopSnd(k);if(!anyPlaying())stopAll();return}
+  nodes[k]=SOUNDS[k].mk(getMaster());b.classList.add('on');b.setAttribute('aria-pressed','true');armTimer()};
+$('#vol').oninput=e=>master&&master.gain.setTargetAtTime(e.target.value/100,ctx().currentTime,.1);
+$('#tmr').onchange=armTimer;
+
+/* ---------- cuentos (texto original, leído por la voz del celular) ---------- */
+const STORIES=[
+ {t:'La biblioteca bajo el lago',k:'calmo',x:`Había una biblioteca escondida en el fondo de un lago tan quieto que la luna se miraba en él como en un espejo. Nadie sabía quién la había construido. Sus estantes eran de piedra blanda y sus libros no se mojaban, porque el agua allí abajo era tibia y lenta, como un suspiro. Cada noche, una bibliotecaria de cabello plateado encendía faroles con forma de medusa. Su único trabajo era escuchar. Los peces le traían los sueños que la gente olvidaba al despertar, y ella los guardaba en frascos de vidrio, ordenados por color. Los sueños azules eran de calma. Los dorados, de viajes. Los verdes, de casas donde alguien te esperaba. Esta noche, la bibliotecaria abrió un frasco nuevo, todavía vacío, y escribió tu nombre en la etiqueta. Respira despacio, dijo el agua. Ella esperará tu sueño, sin prisa. Los faroles bajan su luz. El lago se cierra como una manta. Y todo, todo, se queda en silencio.`},
+ {t:'El tren de las tres y diez',k:'terror suave',x:`En el pueblo donde creció mi abuela, el último tren pasaba a las once. Pero todos sabían que, algunas noches de niebla, se escuchaba otro, a las tres y diez. No tenía horario ni boletos. Solo un silbido largo, muy largo, que hacía temblar los vidrios. Una noche, mi abuela, que entonces tenía quince años, se asomó a la estación. El tren estaba allí, negro y brillante, con las ventanas encendidas de una luz amarilla. Adentro, los pasajeros dormían, todos con la cabeza apoyada en el vidrio, todos mirando hacia ella. El conductor bajó, se quitó el sombrero y le preguntó, con una voz muy amable: ¿Viene usted? Mi abuela dijo que no. El hombre sonrió, como si ya lo supiera, y le dijo: Entonces será otro día. Ella vivió noventa años. Y cuenta mi madre que la noche en que murió, a las tres y diez, en la casa sin vías ni estación, todos escuchamos un silbido largo. Muy largo.`},
+ {t:'La casa que respiraba',k:'terror suave',x:`La casa de la calle Ciprés era barata porque crujía. Eso dijo el agente. Las casas viejas crujen, señora, es la madera que se acomoda. Lucía se mudó en otoño. La primera noche escuchó el crujido: un sonido lento, que subía y bajaba. La segunda noche lo escuchó más cerca. La tercera noche puso la mano en la pared del dormitorio, y la pared estaba tibia. Subía. Bajaba. Como un pecho dormido. Lucía no gritó. Pensó que, si la casa dormía, lo mejor era no despertarla. Así que aprendió a caminar en puntillas, a cerrar las puertas con suavidad, a hablar en susurros. Vivió allí muchos años, tranquila. Pero nunca, nunca, se atrevió a bajar al sótano. Porque una vez, una sola vez, desde ahí abajo, en medio de la noche, la casa hizo un ruido distinto. Un ruido como de alguien que abre los ojos.`},
+ {t:'El faro y la ballena',k:'calmo',x:`En una isla pequeña vivía un faro que se sentía solo. Cada noche giraba su luz sobre el mar oscuro, y nadie le contestaba. Hasta que una noche de invierno, algo enorme y lento apareció entre las olas. Era una ballena vieja, gris como la piedra, con el lomo cubierto de estrellas de mar. La ballena miró la luz y soltó un chorro de agua al cielo, que brilló como plata. Desde entonces, cada noche, la ballena vuelve. El faro gira su luz, despacio, y la ballena canta, muy bajo, una canción tan grave que se siente en el pecho más que en los oídos. Los pescadores dicen que, cuando la canción suena, el mar se calma y los barcos regresan a casa sin miedo. Escucha. La luz pasa. La ola sube. La ola baja. La ballena canta. Y el faro, por fin, ya no está solo.`}
+];
+$('#stories').innerHTML=STORIES.map((s,i)=>`<div class="story"><div><b>${s.t}</b><br><span class="tag ${s.k.includes('terror')?'p':''}">${s.k}</span></div><button data-st="${i}">▶ Escuchar</button></div>`).join('');
+function voiceEs(){const v=speechSynthesis.getVoices();return v.find(x=>/es[-_](MX|US|419|PE)/i.test(x.lang))||v.find(x=>/^es/i.test(x.lang))}
+$('#stories').onclick=e=>{const i=e.target.dataset.st;if(i==null)return;if(!window.speechSynthesis){e.target.textContent='Tu navegador no lee en voz';return}
+  speechSynthesis.cancel();const s=STORIES[i];
+  s.x.split(/(?<=[.?!])\s+/).forEach(p=>{const u=new SpeechSynthesisUtterance(p);u.lang='es-ES';const v=voiceEs();if(v)u.voice=v;u.rate=.82;u.pitch=s.k.includes('terror')?.75:.95;u.volume=1;speechSynthesis.speak(u)})};
+$('#stopStory').onclick=()=>window.speechSynthesis&&speechSynthesis.cancel();
+window.speechSynthesis?.getVoices();
+}
+</script>
+</body>
+</html>
